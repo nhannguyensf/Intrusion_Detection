@@ -7,11 +7,11 @@ import datetime
 import threading
 
 
-def isInside(points, centroid):
-    polygon = Polygon(points)
-    centroid = Point(centroid)
-    print(polygon.contains(centroid))
-    return polygon.contains(centroid)
+# def isInside(points, centroid):
+#     polygon = Polygon(points)
+#     centroid = Point(centroid)
+#     print(polygon.contains(centroid))
+#     return polygon.contains(centroid)
 
 
 class YoloDetect():
@@ -42,20 +42,20 @@ class YoloDetect():
         layer_names = self.model.getLayerNames()
         self.output_layers = [layer_names[i - 1] for i in self.model.getUnconnectedOutLayers()]
 
-    def draw_prediction(self, img, class_id, x, y, x_plus_w, y_plus_h, points):
+    def draw_prediction(self, img, class_id, x, y, x_plus_w, y_plus_h):
         label = str(self.classes[class_id])
         color = (0, 255, 0)
         cv2.rectangle(img, (x, y), (x_plus_w, y_plus_h), color, 2)
         cv2.putText(img, label, (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-        # Tinh toan centroid
-        centroid = ((x + x_plus_w) // 2, (y + y_plus_h) // 2)
-        cv2.circle(img, centroid, 5, (color), -1)
+        # # Tinh toan centroid
+        # centroid = ((x + x_plus_w) // 2, (y + y_plus_h) // 2)
+        # cv2.circle(img, centroid, 5, (color), -1)
 
-        if isInside(points, centroid):
-            img = self.alert(img)
-
-        return isInside(points, centroid)
+        # if isInside(points, centroid):
+        img = self.alert(img)
+        return True
+        # return isInside(points, centroid)
 
     def alert(self, img):
         cv2.putText(img, "ALARM!!!!", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
@@ -68,7 +68,7 @@ class YoloDetect():
             thread.start()
         return img
 
-    def detect(self, frame, points):
+    def detect(self, frame):
         blob = cv2.dnn.blobFromImage(frame, self.scale, (416, 416), (0, 0, 0), True, crop=False)
         self.model.setInput(blob)
         outs = self.model.forward(self.output_layers)
@@ -95,13 +95,13 @@ class YoloDetect():
                     boxes.append([x, y, w, h])
 
         indices = cv2.dnn.NMSBoxes(boxes, confidences, self.conf_threshold, self.nms_threshold)
-
         for i in indices:
             box = boxes[i]
             x = box[0]
             y = box[1]
             w = box[2]
             h = box[3]
-            self.draw_prediction(frame, class_ids[i], round(x), round(y), round(x + w), round(y + h), points)
+            self.draw_prediction(frame, class_ids[i], round(x), round(y), round(x + w), round(y + h))
+            print(round(x), round(y), round(x + w), round(y + h))
 
         return frame
