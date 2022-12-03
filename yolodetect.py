@@ -1,18 +1,8 @@
-from shapely.geometry import Point
-from shapely.geometry.polygon import Polygon
 import cv2
 import numpy as np
 from telegram_utils import send_telegram
 import datetime
 import threading
-
-
-# def isInside(points, centroid):
-#     polygon = Polygon(points)
-#     centroid = Point(centroid)
-#     print(polygon.contains(centroid))
-#     return polygon.contains(centroid)
-
 
 class YoloDetect():
     def __init__(self, detect_class="person", frame_width=1280, frame_height=720):
@@ -48,22 +38,16 @@ class YoloDetect():
         cv2.rectangle(img, (x, y), (x_plus_w, y_plus_h), color, 2)
         cv2.putText(img, label, (x - 10, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-        # # Tinh toan centroid
-        # centroid = ((x + x_plus_w) // 2, (y + y_plus_h) // 2)
-        # cv2.circle(img, centroid, 5, (color), -1)
-
-        # if isInside(points, centroid):
         img = self.alert(img)
         return True
-        # return isInside(points, centroid)
 
     def alert(self, img):
         cv2.putText(img, "ALARM!!!!", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
         # New thread to send telegram after 15 seconds
-        if (self.last_alert is None) or (
-                (datetime.datetime.utcnow() - self.last_alert).total_seconds() > self.alert_telegram_each):
+        if (self.last_alert is None) or ((datetime.datetime.utcnow() - self.last_alert).total_seconds() > self.alert_telegram_each):
             self.last_alert = datetime.datetime.utcnow()
-            cv2.imwrite("alert.png", cv2.resize(img, dsize=None, fx=0.2, fy=0.2))
+            # cv2.imwrite("alert.png", cv2.resize(img, dsize=None, fx=0.2, fy=0.2))
+            cv2.imwrite("alert.png", img)
             thread = threading.Thread(target=send_telegram)
             thread.start()
         return img

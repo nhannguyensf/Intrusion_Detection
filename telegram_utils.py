@@ -10,4 +10,4 @@ def send_telegram(photo_path="alert.png"):
     except Exception as ex:
         print("Can not send message telegram at {}".format(datetime.now().strftime("%H:%M:%S-%d/%m/%Y")), ex)
 
-    print("Send sucess at {}".format(datetime.now().strftime("%H:%M:%S-%d/%m/%Y")))
+    print("Send success at {}".format(datetime.now().strftime("%H:%M:%S-%d/%m/%Y")))
