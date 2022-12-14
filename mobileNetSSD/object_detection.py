@@ -1,20 +1,10 @@
 from argparse import ArgumentParser
-
 import cv2
-
-from utils import (
-    CLASSES,
-    COLORS,
-    CONFIDENCE,
-    dnn_detection_to_points,
-    draw_bounding_box_with_label,
-)
+from utils import (CLASSES, COLORS, CONFIDENCE, dnn_detection_to_points, draw_bounding_box_with_label, )
 
 # parse the script parameters
 parser = ArgumentParser(description="Recognize a object in an image")
-parser.add_argument(
-    "--image", dest="image_path", help="Path to the image", required=True
-)
+parser.add_argument("--image", dest="image_path", help="Path to the image", required=True)
 args = parser.parse_args()
 image_path = args.image_path
 
@@ -32,9 +22,7 @@ input_size = (300, 300)
 resized_image = cv2.resize(image, dsize=input_size)
 
 # run model
-blob = cv2.dnn.blobFromImage(
-    resized_image, scalefactor=0.007843, size=input_size, mean=127.5
-)
+blob = cv2.dnn.blobFromImage(resized_image, scalefactor=0.007843, size=input_size, mean=127.5)
 net.setInput(blob)
 detections = net.forward()
 
